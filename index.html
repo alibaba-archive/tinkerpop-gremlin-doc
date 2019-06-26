@@ -539,6 +539,7 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel2">
 <li><a href="#general-steps">通用单步（抽象）</a></li>
 <li><a href="#terminal-steps">结束性单步</a></li>
+<li><a href="#gdb-id">阿里巴巴GDB的图元素id</a></li>
 <li><a href="#addedge-step">AddEdge Step</a></li>
 <li><a href="#addvertex-step">AddVertex Step</a></li>
 <li><a href="#addproperty-step">AddProperty Step</a></li>
@@ -641,6 +642,26 @@ table.CodeRay td.code>pre{padding:0}
 </div>
 </div>
 <div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+请注意本文档是官方gremlin文档的中文翻译。对于操作阿里云GDB图数据库而言，是在gremlin语言框架下的实现，
+这就意味着很多单步具有特殊的实现和约定。使用特定的语义和方式能够让图遍历更有效率。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>阿里云GDB团队翻译，如有疑问，订正，和转载需求，请发信至 <a href="mailto:nosql@list.alibaba-inc.com">nosql@list.alibaba-inc.com</a></p>
+</div>
+</div>
+</div>
 <h1 id="traversal" class="sect0"><a class="anchor" href="#traversal"></a>图的遍历（Traversal）</h1>
 <div class="openblock partintro">
 <div class="content">
@@ -1039,6 +1060,39 @@ g.addV('person').iterate() <i class="conum" data-value="9"></i><b>(9)</b></pre>
 </div>
 </div>
 <div class="sect2">
+<h3 id="gdb-id"><a class="anchor" href="#gdb-id"></a>阿里巴巴GDB的图元素id</h3>
+<div class="paragraph">
+<p>在阿里云GDB图数据库的实现中，对于边和顶点元素，提供了自动id。简而言之，如果用户在创建点和属性时，如果不创建id，那么
+GDB图数据库就会自动为用户创建一个id，目前默认是一串uuid，如 <code>5c06721a-1fdc-42bc-b063-ac4178ee95a0</code>，
+如果用户想自定义id，那么就需要使用`property(id, "user-defined-id")` 来添加。注意id不使用引号。
+同样，如果需要引用顶点，也需要使用g.V(<em>user-defined-id</em>).如g.V(<em>1</em>)，而非g.V(user-defined-id)，如g.V(1)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>g.addV('product').property('name', 'GDB').property(id, "1") <i class="conum" data-value="1"></i><b>(1)</b>
+g.addV('entity').property('name', 'aliyun')
+g.V().has('entity','name','aliyun').id() <i class="conum" data-value="2"></i><b>(2)</b>
+g.addV('product').property('name', 'gremlin').property('id', "25") <i class="conum" data-value="3"></i><b>(3)</b></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>指定GDB顶点的id为1（注意不需要双引号）。如果增加双引号，那么只不过是增加了一个&#8217;id&#8217;的属性，而非顶点id</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>默认的，输出GDB默认生成的uuid，如 <code>5c06721a-1fdc-42bc-b063-ac4178ee95a0</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>与1不同，这个id同样是自动生成的，通过property传入带有引号id的是一个属性，而非顶点id</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
 <h3 id="addedge-step"><a class="anchor" href="#addedge-step"></a>AddEdge Step</h3>
 <div class="paragraph">
 <p><a href="http://en.wikipedia.org/wiki/Automated_reasoning">自动推理</a> 实际上是将数据中隐式的关系显式化的过程。
@@ -1128,6 +1182,18 @@ g.addE('knows').from(marko).to(peter) <i class="conum" data-value="7"></i><b>(7)
 </tr>
 </table>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+【GDB特性】图元素的遍历在GDB中使用g.V(<em>1</em>)的形式，而非g.V(1)。另外，请参考<a href="#gdb-id"><code>GDB的id</code></a>来使用GDB中的图元素id
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p><strong>更多参考</strong></p>
 </div>
@@ -1150,6 +1216,18 @@ g.V().outE('knows').addV().property('name','nothing')
 g.V().has('name','nothing')
 g.V().has('name','nothing').bothE()</pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+【GDB特性】图元素的遍历在GDB中使用g.V(<em>1</em>)的形式，而非g.V(1)。另外，请参考<a href="#gdb-id"><code>GDB的id</code></a>来使用GDB中的图元素id
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p><strong>更多参考</strong></p>
@@ -1191,6 +1269,18 @@ g.V(1).properties('friendWeight').valueMap() <i class="conum" data-value="3"></i
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
 <td>对顶点来说，<code>property()</code> 单步可以添加元数据属性（meta-properties）</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+【GDB特性】对于GDB添加图元素的id需要使用特殊形式，请参考<a href="#gdb-id"><code>GDB的id</code></a>来使用GDB中的图元素id
+</td>
 </tr>
 </table>
 </div>
@@ -2437,6 +2527,18 @@ g.V(1).out().id().is(2)
 g.V(1).outE().id()
 g.V(1).properties().id()</pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+【GDB特性】请参考<a href="#gdb-id"><code>GDB的id</code></a>来使用GDB中的图元素id
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p><strong>更多参考</strong></p>
@@ -4221,6 +4323,20 @@ g.V().has('name','marko').
                  by(outE().count()).
                  by(inE().count())</pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+【中文添加，方便读者理解】<code>Project</code> 可以理解为一个格式化输出接口：它可以将数据组织下，然后传递到后面的单步。但是，在组织数据的时候，
+如果后面的格式化输出同样操作了遍历器，那么它就被执行了，发生了内部状态变化。这就是“但调整当前遍历器的状态”的含义。就好比格式化输出一个字符串，
+而打印这个字符串的时候，同时打印函数改变了内部变量一样。只能说明是通过引用来实现project，克隆
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p><strong>更多参考</strong></p>
@@ -7011,7 +7127,7 @@ social.persons(<span class="string"><span class="delimiter">&quot;</span><span c
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-06-25 16:27:52 +0800
+Last updated 2019-06-26 19:19:43 +0800
 </div>
 </div>
 </body>
